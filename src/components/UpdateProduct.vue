@@ -42,7 +42,7 @@
                             <b-form-group class="col-sm-4">
                                     <label>Imagem do Produto</label>
                                
-                                 <b-form-file placeholder="nome da imagem"> </b-form-file>
+                                 <b-form-file @change="handleFileUpload()" placeholder="nome da imagem"> </b-form-file>
                                 
                             </b-form-group>
                 </b-row>
@@ -87,7 +87,9 @@ export default {
             }).catch(e=>{
                 console.log(e);
             })
-        }
+        },
+
+       
     },
 }
 </script>

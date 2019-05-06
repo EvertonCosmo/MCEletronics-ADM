@@ -1,7 +1,9 @@
 <template>
-    <header class="nav-bar">
-        <span class="logo">{{tittle}}</span>
-    </header>
+    <nav>
+      <div class="nav-wrapper blue darken-1">
+        <a href="#" class="brand-logo center">{{tittle}}</a>
+      </div>
+    </nav>
 </template>
 
 
@@ -22,14 +24,14 @@ export default {
 
 <style scoped>
 
-.nav-bar{
+.nav-wrapper{
         background: linear-gradient(-90deg,#033076);
-        box-shadow: 1px 2px 2px 2px #033076;
+        /* box-shadow: 1px 2px 2px 2px #033076;
         height: 4rem;
         width: 100%;
         margin-bottom: 10px;
         margin:auto;
-        
+         */
     }
     .logo{
         color:white;

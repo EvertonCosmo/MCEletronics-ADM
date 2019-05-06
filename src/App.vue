@@ -8,8 +8,8 @@
 
 <script>
 
-import MainBar from "./components/MainBar.vue"
-import HomePage from "./components/HomePage.vue"
+import HomePage from "./components/HomePage"
+import MainBar from "./components/MainBar"
 export default {
   name: 'app',
   components: {
