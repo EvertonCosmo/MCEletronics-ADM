@@ -12,7 +12,7 @@ export default{
         return http.get('products')
     },
     delete:(product)=>{
-        return http.delete('/'+id,{data:product})
+        return http.delete('product',{data:product})
     }
 
 }

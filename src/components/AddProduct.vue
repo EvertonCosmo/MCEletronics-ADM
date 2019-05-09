@@ -104,7 +104,7 @@ export default {
             })
         },
          handleFileUpload(){
-            this.file = this.$$refs.file.files[0];
+            this.file = this.$refs.file.files[0];
         }
     },
 }
