@@ -1,7 +1,8 @@
 <template>
     <nav class="nav-wrapper">
       <div>
-            <a href="#" class="brand-logo center">{{tittle}}</a>
+        
+            <router-link to="/" class="brand-logo center">{{tittle}}</router-link>
       </div>
         
       

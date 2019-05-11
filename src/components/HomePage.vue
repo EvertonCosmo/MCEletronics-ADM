@@ -1,7 +1,10 @@
 <template>
+<div>
+    <main-bar></main-bar>
+
 
     <div class="container">
-        
+
         <ul>
          <li v-for="(erro, index) of errors" :key="index">
           campo <b>{{erro.field}}</b> - {{erro.defaultMessage}}
@@ -10,8 +13,20 @@
 
       <form class="md-layout" @submit.prevent ="saveProduct">
 
+<b-alert :show="dismissCountDown"
+              dismissible
+              :variant="variant"
+              @dismissed="dismissCountDown=0"
+              @dismiss-count-down="countDownChanged"
+              class="fixed-bottom"
+              style="width: 35%; "
+              >
 
-          
+              {{message}}
+      </b-alert>
+             
+  
+     
              <label>Nome</label>
             <b-input type="text" v-model="product.name" placeholder="Nome"  required ></b-input>
         
@@ -19,7 +34,7 @@
            
         
              <label>Código de barras</label>
-             <b-input type="text" v-model="product.id" placeholder="Identificação" required></b-input>
+             <b-input type="text"  placeholder="Identificação" required></b-input>
        
 
        
@@ -30,35 +45,29 @@
           
           <label>Categoria</label>
           <b-form-select v-model="product.category" :options="options"> </b-form-select>
-            <!-- <div class="mt-3">Selected: <strong>{{ product.category }}</strong></div> -->
-          <!-- <b-select v-model="product.category">
-            <option value="eletronico" selected>eletrônico</option>
-            <option value="placa">placa</option>
-            <option value="iniciante">iniciante</option>
-            <option value="som">som</option>
-            <option value="música">música</option>
-          </b-select> -->
-         
-          
-          
-
-          
+           
           <label>Preço</label>
           <b-input type="text" v-model="product.price" placeholder="Preço"  inputmode="numeric"  pattern="[0-9]*" required></b-input>
+          <!-- <v-currency-field label="Value" v-bind="currency_config" :error-messages="errors.price" v-model="product.price"></v-currency-field> -->
           
             <br>
            <label>Imagem do Produto</label>
             <!-- <vue-dropify style="width:20%;" v-model="product.photo" required></vue-dropify> -->
-            <b-form-file accept="image/*"></b-form-file>
-            
-             <b-button type="submit"  style="margin-top:4% " class="float-right" variant="primary">
+            <b-form-file accept="image/*"  v-model="product.file" id="file" name="image" ref="file" @change="handleFileUpload()"></b-form-file>
+          
+            <br> 
+            <br>
+            <b-textarea v-model="product.description"  placeholder="descrição do produto">
+
+            </b-textarea>
+           
+             <b-button type="submit"  style="margin-top:3% " class="float-right" variant="primary">
                  Salvar<i class="material-icons" alt="salvar">save</i></b-button>
+           
                  
 
 </form>
- <b-button  style="margin-top:4% " class="float-left" variant="primary">
-                 Atualizar<i class="material-icons" alt="salvar" @click="getProducts">update</i></b-button>
-      <table style="width:100%">
+      <table  style="width:100%" v-show="load" class="table table-responsive">
                 <thead>
                       <tr>
                           <th>id</th>
@@ -71,138 +80,181 @@
                       </tr>
                 </thead>
                   
-                <tbody >
-                      <tr :key="product.id" v-for="product of products">
+                <tbody  >
+                      <tr :key="product.id" v-for="product in products">
                             <td>{{product.id}}</td>
                             <td>{{product.name}}</td>
-                            <td>{{product.categorie}}</td>
+                            <td>{{product.category}}</td>
                             <td>{{product.price}}</td>
                             <td>{{product.quantity}}</td>
                             <td>
-                                <b-button @click="edit" alt="editar" variant="primary" ><i class="material-icons">create</i></b-button>
-                                <b-button @click="remove(product.id)" variant="danger" alt="remover" ><i class="material-icons">delete_sweep</i></b-button>
+                                 <!-- <router-link :to="{ name:'product-view', params: {id: product.id} } "> -->
+                                  <b-button @click ="show(product)" alt="ver" style="margin: 1%"variant="primary" ><i class="material-icons">vignette</i></b-button>
+                                  <Modal id="my-modal" v-if="modalShow" @close ="modalShow = false" 
+                                         :product="product_modal" :edit="edit">
+                                    
+                                  </Modal>
+                                  <!-- </router-link> -->
+                                
+                                  <b-button @click="editModal(product)" style="margin: 1%" alt="editar" variant="primary" ><i class="material-icons">create</i></b-button>
+                                   <Modal id="my-modal" v-if="modalShow" @close ="modalShow = false" 
+                                         :product="product_modal" :edit="edit" :options="options">
+                                    
+                                  </Modal>
+                                
+                                <b-button   @click="remove(product.id)" variant="danger" alt="remover" ><i class="material-icons">delete_sweep</i></b-button>
+                           
+                               
                             </td>
                       </tr>
                 </tbody>
                   
               </table>
-<ul >
-  <li v-for="product in products">{{product.id}} - {{product.name}}</li>
-</ul>
+
 
     </div>
+</div>
 </template>
 
 
 <script>
 import axios from "axios";
-// import ProductService from "../services/products.js"
-import VueDropify from  "vue-dropify"
+import MainBar from "./MainBar"
+import ProductService from "../services/products.js"
+import Modal from "./Modal"
+// import VueDropify from  "vue-dropify"
+
 
 export default {
     name:"HomePage",
     components:{
-         'vue-dropify': VueDropify
+        MainBar,Modal
+        //  'vue-dropify': VueDropify 
+        
     },
     data(){
         return{
-            api:"http://localhost:8080/project/api/products",
-            load: false,
+            load:false,
+            modalShow: false,
+            edit:false,
+            dismissSecs: 3,
+            dismissCountDown: 0,
+            variant:'',
+            message:'',
             product: {
-                id:'',
-                bar_cod:'',
+               file:null,
+                // id:'',
                 name:'',
                 price:'',
                 category:'',
                 quantity:'',
-                photo:''    
+                description:'',
+              
             },
-            options:[
-                
-                {value:"eletronico",text:"eletronico"},
-                {value:"placa",text:"placa"},
-                {value:"iniciante",text:"iniciante"},
-                {value:"som",text:"som"},
-                {value:"música",text:"música"}
+            product_modal : {
+                file:null,
+                name:'',
+                price:'',
+                category:'',
+                quantity:'',
+                description:'',
+            },
+
+            
+            options:[ 
+                {value:"Eletronico",text:"Eletrônico"},
+                {value:"Placa",text:"Placa"},
+                {value:"Iniciante",text:"Iniciante"},
+                {value:"Som",text:"Som"},
+                {value:"Música",text:"Musica"}
             ],
+
             products:[],
             errors:[]
         }
     },
     methods:{
+       countDownChanged(dismissCountDown) {
+        this.dismissCountDown = dismissCountDown
+      },
+       showAlert() {
+        this.dismissCountDown = this.dismissSecs
+      },
         getProducts(){
-            axios.get(this.api).then(Response => {
-                this.products = Response.data.product
+            ProductService.get().then(Response => {
+                if(Response.data.product.length > 1){
+                   this.products = Response.data.product;
+                   this.load = true;
+                }else{
+                    this.products = Response.data;
+                    this.load = true;
+                }
+
             }).catch(e =>{
                 console.log(e)
             })
+ 
+
+
           },
+      show(product){
+        this.product_modal = product;
+        this.edit = false;
+        this.modalShow = true;
 
-        edit(){
-            let formData = new FormData();
-            formData.append('id',this.id);
-            formData.append('name',this.name);
-            formData.append('price',this.price);
-            formData.append('categorie',this.category);
-            formData.append('quantity',this.quantity); 
 
-            axios.put(this.api + "/" + this.idProduct,formData).then(Response => {
-                console.log(Response);
-            }).catch(e=>{
-                console.log(e);
-            })
-        },
-
-        
+      } ,
+      editModal(product){
+         this.product_modal = product;
+         this.edit = true;
+         this.modalShow = true;
+      },
         saveProduct(){
             let formData = new FormData()
-          
-                
-                formData.append('id',this.product.id);
-                formData.append('name',this.product.name);
-                formData.append('price',this.product.price);
-                formData.append('categorie',this.product.category);
-                formData.append('quantity',this.product.quantity);
-
-                
-                    axios.post(this.api,formData
-                        ).then(Response => {
-                        this.product = {}
-                        // INFORMATION SUCESS 
-                        alert("adicionado com sucesso")
-                       // get Products updated
-                        this.load = true
-                        this.erros = {}
-                        // this.getData()
-                    }).catch(e => {
-                        console.log(e)
-                        this.errors = e.response.data.errors
-                    })
+                   formData.append('image', this.product.file);
+                    formData.append('name', this.product.name);
+                    formData.append('category', this.product.category);
+                    formData.append('price', this.product.price);
+                    formData.append('quantity', this.product.quantity);
+                    formData.append('description', this.product.description);
+            ProductService.post(formData).then(Response => {
+                console.log(Response.data);
+                this.product = {}
+                this.variant = "primary"
+                this.message = "Adicionado com sucesso"
+                // alert("adicionado com sucesso")
+                this.showAlert()
+                this.getProducts()
+            }).catch(e => {
+                this.variant = "warning"
+                this.message = "error"
+                this.showAlert()
+                console.log(e)
+            })
+                    
+                  
 
             
         },
-        getData(){
-            axios.get(this.api).then(Response => {
-                this.products = Response.data
-            }).catch(e =>{
-                console.log(e)
-            })
-        },
         remove(index){
+        
+          
             if(confirm("Deseja remover o produto ? ")){
-                    axios.delete(this.api + "/" + index).then(Response =>{
-                        // this.products.splice(id,1);
-                        // this.getProducts()
-                        // this.getData()
 
-                    }).catch(e => {
-                        console.log(e)
-                        this.errors = e.response.data.errors
-                    })
+              ProductService.delete(index).then(Response => {
+                this.variant = "warning"
+                this.message = "removido com sucesso"
+                this.getProducts()
+                this.showAlert()
+              }).catch(e=>{
+                console.log(e)
+              })
             }
+      
+
         },
          handleFileUpload(){
-            // this.photo = this.$refs.file.files[0];
+             this.product.file = this.$refs.file.files[0];
         }
 
     },

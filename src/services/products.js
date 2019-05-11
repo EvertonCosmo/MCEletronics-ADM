@@ -2,17 +2,24 @@ import {http} from "./config"
 
 export default{
     // CRUD 
-    post:(product) =>{
-        return http.post('product',product) 
+    
+    post:(product)=>{
+         // product.append('image',file);
+         return http.post('products', product)
+          
     },
-    update: (product) => {
-        return http.put('product', product)
+    update: (product,id) => {
+        return http.put('products/' +id, product)
     },
+
     get:()=>{
         return http.get('products')
     },
-    delete:(product)=>{
-        return http.delete('product',{data:product})
+    getProduct:(id)=>{
+        return http.get('products/'+id)
+    },
+    delete:(id)=>{
+        return http.delete('products/'+ id)
     }
 
 }
