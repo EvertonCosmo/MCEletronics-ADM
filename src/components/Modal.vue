@@ -41,7 +41,7 @@
               
       <form class="md-layout" @submit.prevent ="updateProduct">
 
-<!-- <b-alert :show="dismissCountDown"
+<b-alert :show="dismissCountDown"
               dismissible
               :variant="variant"
               @dismissed="dismissCountDown=0"
@@ -52,7 +52,7 @@
 
               {{message}}
       </b-alert>
-              -->
+             
   
      
              <label>Nome</label>
@@ -61,7 +61,7 @@
 
         
           <label>Quantidade</label>
-          <b-input type="number" v-model="product.quantity"  :value="product.quantity"  placeholder="Quantidade" value="1" step="1" min="1" pattern="[0-9]*" inputmode="numeric"  required></b-input>
+          <b-input type="number" v-model="product.quantity"  :value="product.quantity"  placeholder="Quantidade" step="1" min="1" pattern="[0-9]*" inputmode="numeric"  required></b-input>
           
 
           
@@ -69,7 +69,7 @@
           <b-form-select v-model="product.category"  :value="product.category" :options="options"> </b-form-select>
            
           <label>Preço</label>
-          <b-input type="text" v-model="product.price"  :value="product.price" placeholder="Preço"  inputmode="numeric"  pattern="[0-9]*" required></b-input>
+          <b-input type="number" v-model="product.price"  :value="product.price" placeholder="Preço"  inputmode="numeric"  pattern="[0-9]*" required></b-input>
           <!-- <v-currency-field label="Value" v-bind="currency_config" :error-messages="errors.price" v-model="product.price"></v-currency-field> -->
           
             <br>
@@ -79,7 +79,7 @@
           
             <br> 
             <br>
-            <b-textarea v-model="product.description" :value="product.description" placeholder="descrição do produto">
+            <b-textarea v-model="product.description" maxlength="150"  :value="product.description" placeholder="descrição do produto">
 
             </b-textarea>
            
@@ -93,13 +93,14 @@
             </slot>
              <b-row class="modal-footer">
             <slot name="footer">
-                       <b-button variant="primary" @click="$emit('close')">
-                                  Fechar
-                       </b-button>   
+                     
                 
                 </slot>
                
           </b-row>
+            <b-button variant="primary" class="" @click="$emit('close')" style="margin-top:-1%">
+                                  Fechar
+                       </b-button>   
           </div>
 
      
@@ -186,9 +187,19 @@
       return{
           file: null,
           id:this.product.id,
+          dismissSecs: 3,
+          dismissCountDown: 0,
+          variant:'',
+          message:'',
       }
     },
     methods:{
+        countDownChanged(dismissCountDown) {
+        this.dismissCountDown = dismissCountDown
+      },
+       showAlert() {
+        this.dismissCountDown = this.dismissSecs
+      },
       updateProduct(){
         let formData = new FormData()
                    formData.append('image', this.file);
@@ -202,10 +213,14 @@
                 // this.product = {}
                 // alert("adicionado com sucesso")
                 // this.showAlert()
-                
+                this.variant = "primary"
+                this.message = "Atualizado com sucesso"
+                // alert("adicionado com sucesso")
+                this.showAlert()
             }).catch(e => {
-               console.log(this.id)
-              console.log(this.product)
+             this.variant = "warning"
+                this.message = "Erro ao atualizar"
+                this.showAlert()
                 console.log(e)
             })
                     

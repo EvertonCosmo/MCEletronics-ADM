@@ -2,7 +2,7 @@
     <nav class="nav-wrapper">
       <div>
         
-            <router-link to="/" class="brand-logo center">{{tittle}}</router-link>
+            <p class="brand-logo center"  >{{tittle}}</p>
       </div>
         
       
@@ -31,6 +31,7 @@ nav{
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   font-weight: normal;
   color: rgba(0, 0, 0, 0.87);
+ 
 }
 nav .brand-logo {
   position: absolute;

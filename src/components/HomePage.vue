@@ -34,7 +34,7 @@
            
         
              <label>Código de barras</label>
-             <b-input type="text"  placeholder="Identificação" required></b-input>
+             <b-input type="text" maxlength="10" placeholder="Identificação" required></b-input>
        
 
        
@@ -57,7 +57,7 @@
           
             <br> 
             <br>
-            <b-textarea v-model="product.description"  placeholder="descrição do produto">
+            <b-textarea v-model="product.description"  maxlength="150" placeholder="descrição do produto">
 
             </b-textarea>
            
