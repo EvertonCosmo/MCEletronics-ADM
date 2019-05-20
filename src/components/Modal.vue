@@ -69,9 +69,11 @@
           <b-form-select v-model="product.category"  :value="product.category" :options="options"> </b-form-select>
            
           <label>Preço</label>
-          <b-input type="number" v-model="product.price"  :value="product.price" placeholder="Preço"  inputmode="numeric"  pattern="[0-9]*" required></b-input>
+          <!-- <b-input type="number" v-model="product.price"  :value="product.price" placeholder="Preço"  inputmode="numeric"  pattern="[0-9]*" required></b-input> -->
           <!-- <v-currency-field label="Value" v-bind="currency_config" :error-messages="errors.price" v-model="product.price"></v-currency-field> -->
-          
+           <div>
+          <money v-model="product.price" v-bind="money" class="form-control"></money> 
+          </div>
             <br>
            <label>Imagem do Produto</label>
             <!-- <vue-dropify style="width:20%;" v-model="product.photo" required></vue-dropify> -->
@@ -175,6 +177,7 @@
 
 <script>
   import ProductService from "../services/products.js"
+  import {Money} from 'v-money'
 	export default{
 		name:'Modal',
 		props: {
@@ -185,6 +188,13 @@
 
     data(){
       return{
+         money: {
+            decimal: ',',
+            thousands: '.',
+            prefix: 'R$ ',
+            precision: 2,
+            masked: false,
+          },
           file: null,
           id:this.product.id,
           dismissSecs: 3,

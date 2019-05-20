@@ -47,12 +47,17 @@
           <b-form-select v-model="product.category" :options="options"> </b-form-select>
            
           <label>Preço</label>
-          <b-input type="text" v-model="product.price" placeholder="Preço"  inputmode="numeric"  pattern="[0-9]*" required></b-input>
+          <!-- <b-input type="text" v-model="product.price" placeholder="Preço"  inputmode="numeric"  pattern="[0-9]*" required></b-input> -->
           <!-- <v-currency-field label="Value" v-bind="currency_config" :error-messages="errors.price" v-model="product.price"></v-currency-field> -->
-          
+         <div>
+          <money v-model="product.price" v-bind="money" class="form-control"></money> 
+          </div>
+
             <br>
            <label>Imagem do Produto</label>
-            <!-- <vue-dropify style="width:20%;" v-model="product.photo" required></vue-dropify> -->
+            <!-- <vue-dropify style="width:20%;" v-model="product.photo" required></vue-dropify> 
+              ADD MORE PHOTOS 
+            --> 
             <b-form-file accept="image/*"  v-model="product.file" id="file" name="image" ref="file" @change="handleFileUpload()"></b-form-file>
           
             <br> 
@@ -89,7 +94,7 @@
                             <td>{{product.quantity}}</td>
                             <td>
                                  <!-- <router-link :to="{ name:'product-view', params: {id: product.id} } "> -->
-                                  <b-button @click ="show(product)" alt="ver" style="margin: 1%"variant="primary" ><i class="material-icons">vignette</i></b-button>
+                                  <b-button @click ="show(product)" alt="ver" style="margin: 1%" variant="primary" ><i class="material-icons">vignette</i></b-button>
                                   <Modal id="my-modal" v-if="modalShow" @close ="modalShow = false" 
                                          :product="product_modal" :edit="edit">
                                     
@@ -122,6 +127,7 @@ import axios from "axios";
 import MainBar from "./MainBar"
 import ProductService from "../services/products.js"
 import Modal from "./Modal"
+import {Money} from 'v-money'
 // import VueDropify from  "vue-dropify"
 
 
@@ -134,6 +140,14 @@ export default {
     },
     data(){
         return{
+          
+          money: {
+            decimal: ',',
+            thousands: '.',
+            prefix: 'R$ ',
+            precision: 2,
+            masked: false,
+          },
             load:false,
             modalShow: false,
             edit:false,
@@ -171,9 +185,9 @@ export default {
 
             products:[],
             errors:[]
-        }
+          }
     },
-    methods:{
+    methods: {
        countDownChanged(dismissCountDown) {
         this.dismissCountDown = dismissCountDown
       },
